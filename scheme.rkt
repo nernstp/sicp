@@ -1,136 +1,392 @@
-;1.8
-(define (cr guess x)
+#|
+1.1
+10
+12
+8
+3
+6
+-
+-
+19
+#f
+4
+16
+6
+16
+
+|#
+
+
+
+;1.2
+#|
+(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
+   (* 3 (- 6 2) (- 2 7)))
+|#
+;1.3
+
+(define (sq-of-sum a b)
+  (+ (* a a) (* b b)))
+(define (t3 x y z)
+  (if (< x y)
+      (if (< z x)
+          (sq-of-sum x y)
+          (sq-of-sum z y))
+      (if (< z y)
+          (sq-of-sum x y)
+          (sq-of-sum z x))))
+          
+;1.5
+(define (p) (p))
+(define (test x y)
+  (if (= x 0) 0 y))
+
+;1.6
+(define (sqrt-iter guess x)
   (if (ge? guess x)
       guess
-      (cr (improve guess x) x)))
+      (sqrt-iter (improve guess x) x)))
 
-(define (ge? g x)
-   (< (abs (- (/ (nm g x) g) 1)) 0.000000000000001))
+(define (improve guess x)
+  (average guess (/ x guess)))
 
-(define (nm g x)
-  (/ (+ (/ x (* g g)) (* 2 g)) 3))
+(define (average x y)
+  (/ (+ x y) 2))
 
-(define (improve g x)
-  (/ (+ g (nm g x)) 2))
+(define (good-enough? guess x)
+  (< (abs (- (square guess) x)) 0.001))
+(define (ge? guess x)
+  (< (abs (- (/ (square guess) x) 1)) 0.000000000000001))
+  
 
-;(cr 1.0 300000000000000000000000000000000000)
+
+(define (square x)
+  (* x x))
 
 
 
-(define (count-change amount)
-  (cc amount 5))
-(define (cc amount kinds-of-coins)
-  (cond ((= amount 0) 1)
-        ((or (< amount 0) (= kinds-of-coins 0)) 0)
-        (else (+ (cc amount
-                     (- kinds-of-coins 1))
-                 (cc (- amount
-                        (first-denomination kinds-of-coins))
-                     kinds-of-coins)))))
-(define (first-denomination kinds-of-coins)
-  (cond ((= kinds-of-coins 1) 1)
-        ((= kinds-of-coins 2) 5)
-        ((= kinds-of-coins 3) 10)
-        ((= kinds-of-coins 4) 25)
-        ((= kinds-of-coins 5) 50)))
+(define (new-if predicate then-clause else-clause)
+  (cond (predicate then-clause)
+        (else else-clause)))
+          
+(define (nsqi guess x)
+  (new-if (good-enough? guess x)
+          guess
+          (nsqi (improve guess x) x)))
+
+;(sqrt-iter 1.0 0.000000000000001)
+
+
+;1.9
+
+
+
+
+;(define (+ a b)
+;  (if (= a 0) b (inc (+ (dec a) b))))
+
+;(+ 4 5)
+;(inc (+ (dec 4) 5))
+;(inc (+ 3 5))
+;(inc (inc (+ (dec 3) 5)))
+;(inc (inc (+ 2 5)))
+;(inc (inc (inc (+ (dec 2) 5))))
+;(inc (inc (inc (+ 1 5))))
+;(inc (inc (inc (inc (+ (dec 1) 5)))))
+;(inc (inc (inc (inc (+ 0 5)))))
+;(inc (inc (inc (inc 5)
+
+
+
+;(define (+ a b)
+;  (if (= a 0) b (+ (dec a) (inc b))))
+;(+ 4 5)
+;(+ (dec 4) (inc 5))
+;(+ 3 6)
+;(+ (dec 3) (inc 6))
+;(+ 2 7)
+;(+ (dec 2) (inc 7))
+;(+ 1 8)
+;(+ (dec 1) (inc 8))
+;(+ 0 9)
+;9
+
+
+
+;1.10
+(define (A x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1) (A x (- y 1))))))
+
+; f = 2*n
+; g = 2^n
+; h = 2^^^n
+
 
 ;1.11
-(define (fff n)
-  (cond ((< n 3) n)
-        (else (+ (fff (- n 1)) (* 2 (fff (- n 2))) (* 3 (fff (- n 3)))))))
 
-(define (fffi n)
-  (define (cal x y z)
-    (+ x (* 2 y) (* 3 z)))
-  (define (iter a b c i)
-    (cond ((< i n) (iter (cal a b c) a b (+ 1 i)))
-          (else (cal a b c))))
-  (iter 2 1 0 3))
+(define (count-change amount) (cc amount 5))
+(define (cc amount kinds-of-coins)
+(cond ((= amount 0) 1)
+((or (< amount 0) (= kinds-of-coins 0)) 0)
+(else (+ (cc amount
+(- kinds-of-coins 1))
+(cc (- amount
+(first-denomination
+kinds-of-coins))
+kinds-of-coins)))))
+(define (first-denomination kinds-of-coins)
+(cond ((= kinds-of-coins 1) 1)
+((= kinds-of-coins 2) 5)
+((= kinds-of-coins 3) 10)
+((= kinds-of-coins 4) 25)
+((= kinds-of-coins 5) 50)))
+
 
 ;1.12
+#|(define (pt n)
+  (define (ptr x y n)
+    (cond (<= y n)
+          (
+           (cond ((= x y) 1)
+                 ((= x 1) (string-append "1" (ptr (+ 1 x) y)))
+                                         
+|#
+;1.15
+(define (cube x) (* x x x))
+(define (p x) (- (* 3 x) (* 4 (cube x))))
+(define (sine angle)
+  (if (not (> (abs angle) 0.1))
+      angle
+      (p (sine (/ angle 3.0)))))
+
+;a 5
+
+;b n
 
 ;1.16
-(define (expo x y)
-  (define (even? x)
-    (= (remainder x 2) 0))
-  (define (eit b a p)
-    (cond ((= a 0) 1)
-          ((= a 1) (* x p))
-          ((even? a) (eit (* b b) (/ a 2) (* p b)))
-          (else (eit b (- a 1) (* p b)))))
-  (eit x y 1))
-                          
-;1.17
 
-(define (m a b)
-  (define (even? x)
-    (= (remainder x 2) 0))
-  (define (mi x y p)
-    (cond ((= y 0) 0)
-          ((= y 1) (+ a p))
-          ((even? y) (mi (+ x x) (/ y 2) (+ p x)))
-          (else (mi x (- y 1) (+ p x)))))
-  (mi a b 0))
-    
 
-;l.19
+(define (expo b n)
+  (define (even? n)
+    (= (remainder n 2) 0))
+  (define (expoit x y p)
+    (cond ((= 0 y) 1)
+          ((= 1 y) (* b p))
+          ((even? y) (expoit (* x x) (/ y 2) (* p x)))
+          (else (expoit x (- y 1) (* p x)))))
+  (expoit b n 1))
+
+
+
+;1.19
+
 (define (sq x) (* x x))
+
 (define (fib n)
   (fib-iter 1 0 0 1 n))
 (define (fib-iter a b p q count)
-      (cond ((= count 0) b)
-            ((even? count)
-             (fib-iter a
-                       b
-                       (+ p (sq q) (sq p))
-                       (+ q (sq q) (sq p))
-                       (/ count 2)))
-            (else (fib-iter (+ (* b q) (* a q) (* a p))
-                            (+ (* b p) (* a q))
-                            p
-                            q
-                            (- count 1)))))                                                        
-;#| 1 0 0 1
-;   1 1 0 1
-;   2 1
-;   3 2
-;   5 3
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ p (* q q))
+                   (+ q (* p p))
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p)); a <- bq+aq+ap
+                        (+ (* b p) (* a q))        ; b <- bp+aq
+                        p
+                        q
+                        (- count 1)))))
+
+;1.20
+
+#|(define (gcd a b)
+  (cond ((= (remainder a b) 0) b)
+        (else (gcd b (remainder a b)))))
+
+(define (gcd a b)
+(cond ((= remainder a b) 0) b)
+(else (gcd b (remainder a b)))))
+|#
+#|
+gcd 206 40
+gcd 40 6
+gcd 6 4
+gcd 4 2
+gcd 2 0
+
+
+
+|#
+
+;1.21
+
+(define (smallest-divisor n) (find-divisor n 2))
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (next test-divisor)))))
+
+(define (divides? a b) (= (remainder b a) 0))
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder
+          (square (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder
+          (* base (expmod base (- exp 1) m))
+          m))))
+(#%require (only racket/base random))
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1))))) 
+
+(define (fast-prime? n times)
+  (cond ((= times 0) #t)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else #f)))
+
+
+;1.22
+(#%require (only racket/base current-milliseconds))
+(define (runtime) (current-milliseconds))
+
+
+(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) start-time))))
+(define (report-prime elapsed-time)
+  (display " *** ")
+  (display elapsed-time))
+
+(define (search-for-primes n)
+  (define (sfp start count)
+    (if (> count 0)
+         (cond ((prime? start)
+                (timed-prime-test start)
+                ;(display start)
+                (newline)
+                (sfp (+ start 1) (- count 1)))
+               (else (sfp (+ start 1) count)))))
+  (sfp n 3))
+ 
+
+;1.23
+(define (next n)
+  (cond ((even? n) (+ 1 n))
+        (else (+ 2 n))))
+;1.24
 ;
-;
-;
-;0 : 0
-;1 : 1
-;2 : 1
-;3 : 2
-;4 : 3
-;5 : 5
-;6 : 8 = 2^3
-;7 : 13
-;8 : 21 = 3 x 7
-;9 : 34 = 2 x 17
-;10 : 55 = 5 x 11
-;11 : 89
-;12 : 144 = 2^4 x 3^2
-;13 : 233
-;14 : 377 = 13 x 29
-;15 : 610 = 2 x 5 x 61
-;16 : 987 = 3 x 7 x 47
-;17 : 1597
-;18 : 2584 = 2^3 x 17 x 19
-;19 : 4181 = 37 x 113
-;20 : 6765 = 3 x 5 x 11 x 41
-;21 : 10946 = 2 x 13 x 421
-;22 : 17711 = 89 x 199
-;23 : 28657
-;24 : 46368 = 2^5 x 3^2 x 7 x 23
-;25 : 75025 = 5^2 x 3001
-;26 : 121393 = 233 x 521
-;27 : 196418 = 2 x 17 x 53 x 109
-;28 : 317811 = 3 x 13 x 29 x 281
-;29 : 514229
-;30 : 832040 = 2^3 x 5 x 11 x 31 x 61
-;31 : 1346269 = 557 x 2417
-;32 : 2178309 = 3 x 7 x 47 x 2207
+;(define (timed-prime-test2 
+
+
+;1.25
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+
+
+;1.26
+(define (expmod2 base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (* (expmod2 base (/ exp 2) m)
+                       (expmod2 base (/ exp 2) m))
+                    m))
+        (else
+         (remainder (* base
+                       (expmod2 base (- exp 1) m))
+                    m))))
+
+
+;1.27
+
+
+;1.29
+(define (sum term a next b)
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
+
+
+(define (simpson f a b n)
+  (let ((h (/ (- b a) n)))
+  (/
+   (* h
+      (+ (f a)
+         (f (+ a (* n h)))
+         (sum (lambda (x) (* (+ 2 (* 2 (modulo x 2))) (f (+ a (* x h)))))
+              1
+              (lambda (x) (+ x 1))
+              (- n 1))
+         )
+      )
+   3)))
+    
+
+
+;1.30
+(define (sum2 term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (+ (term a) result))))
+  (iter 0 0))
+;1.31a
+
+(define (product term a next b)
+  (define (iter a result)
+    (if (> a b)
+        result
+        (iter (next a) (* (term a) result))))
+  (iter 1 1))
+
+(define (piapp)
+  (product (lambda (x) (if (even? x)
+                           (/ (+ 2.0 x)
+                              (+ 1 x))
+                           (/ (+ 1 x)
+                              (+ 2 x))))
+           1 (lambda (x) (+ 1 x)) 20000000))
+
+;1.31b
+
+(define (product2 term a next b)
+  (if (> a b)
+      1
+      (* (term a)
+         (product2 term (next a) next b ))))
+
+;1.3.3
+(define (close-enough? x y) (< (abs (- x y)) 0.001))
+
+(define (search f neg-point pos-point)
+  (let ((midpoint (average neg-point pos-point)))
+    (if (close-enough? neg-point pos-point)
+        midpoint
+        (let ((test-value (f midpoint)))
+          (cond ((positive? test-value)
+                 (search f neg-point midpoint))
+                ((negative? test-value)
+                 (search f midpoint pos-point))
+                (else midpoint))))))
 
 ;1.32a
 (define (accumulate combiner null-value term a next b)
@@ -302,7 +558,7 @@
   (define (h i)
     (if (> i n)
         f
-        (compose (h (+ n 1)) f)))
+        (compose (h (+ i 1)) f)))
   (h 1))
 
 ;1.44
@@ -312,7 +568,7 @@
                     (f (+ x dx)))
                  3)))
 (define (nfold f n)
-  (lambda (x) (repeated (smooth f) n) x))
+  (lambda (x) (((repeated smooth n) f) x)))
 ;1.45
 (define (fixed-point-of-transform g transform guess)
   (fixed-point (transform g) guess))
@@ -320,7 +576,7 @@
   (lambda (x) (average x (f x))))
 
 (define (r-damp f n)
-  (lambda (x) (repeated (lambda (x) average (f xz)) n) x))
+  (lambda (x) (((repeated average-damp n) f) x)))
 
 (define (cube-root x)
   (fixed-point (average-damp (lambda (y) (/ x (square y))))
@@ -329,3 +585,29 @@
   (fixed-point (r-damp (lambda (y) (/ x (expt y (- n 1))))
                        n)
                1.0))
+
+;1.46
+(define (iterative-improve good? improve)
+  (define (ii x)
+    (if (good? x (improve x))
+        (improve x)
+        (ii (improve x))))
+  (lambda (x)
+    (ii x)))
+(define (sqrtii x)
+  (exact->inexact ((iterative-improve (lambda (a b)
+                        (if (<
+                             (abs
+                              (- a b))
+                             tolerance)
+                            #t
+                            #f))
+                      (lambda (y)
+                        (average y (/ x y)))) x)))
+
+
+
+
+
+
+
