@@ -165,3 +165,13 @@
   (if (even? x)
       (cons x (iter even? y))
       (cons x (iter odd? y))))
+
+;2.21
+(define (square x)
+  (* x x))
+(define (square-list items)
+  (if (null? items)
+      '()
+      (cons (square (car items)) (square-list (cdr items)))))
+(define (sl items)
+  (map
