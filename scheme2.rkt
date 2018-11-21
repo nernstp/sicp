@@ -174,4 +174,6 @@
       '()
       (cons (square (car items)) (square-list (cdr items)))))
 (define (sl items)
-  (map
+  (map square items))
+
+;2.22
