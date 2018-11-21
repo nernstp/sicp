@@ -176,4 +176,8 @@
 (define (sl items)
   (map square items))
 
-;2.22
+;2.23
+(define (for-each2 f x)
+  (if (not (null? x))
+      ((f x)
+       (for-each2 f (cdr x)))))
