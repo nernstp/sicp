@@ -38,14 +38,6 @@
   (car s))
 (define (end s)
   (cdr s))
-(define (average a b)
-  (/ (+ a b) 2))
-
-
-(define (mid-point s)
-  (make-p (average (xp (end s)) (xp (starts s)))
-          (average (yp (end s)) (yp (starts s)))))
-
 
 ;2.3
 (define (lenr s)
@@ -160,8 +152,8 @@
     (if (null? i)
         '()
         (if (p (car i))
-             (cons (car i) (iter p (cdr i)))
-             (iter p (cdr i)))))
+            (cons (car i) (iter p (cdr i)))
+            (iter p (cdr i)))))
   (if (even? x)
       (cons x (iter even? y))
       (cons x (iter odd? y))))
@@ -181,3 +173,184 @@
   (if (not (null? x))
       ((f x)
        (for-each2 f (cdr x)))))
+      
+;2.29a
+(define (make-mobile left right)
+  (list left right))
+(define (make-branch length structure)
+  (list length structure))
+(define (left-branch m)
+  (car m))
+(define (right-branch m)
+  (cadr m))
+(define (branch-length b)
+  (car b))
+(define (branch-structure b)
+  (cadr b))
+;2.29b
+(define (total-weight m)
+  (let ((ls (branch-structure (left-branch m)))
+        (rs (branch-structure (right-branch m))))
+    (+ (if (list? ls)
+           (total-weight ls)
+           ls)
+       (if (list? rs)
+           (total-weight rs)
+           rs))))
+(define test (make-mobile
+              (make-branch 5
+                           (make-mobile
+                            (make-branch
+                             5
+                             (make-mobile (make-branch 1 2)
+                                          (make-branch 2 1)))
+                            (make-branch 3 5)))
+              (make-branch 8
+                           (make-mobile
+                            (make-branch 3 2)
+                            (make-branch 2 3)))))
+
+(define test2 (make-mobile
+               (make-branch 2 1)
+               (make-branch 1 2)))
+;2.29c
+(define (balanced? m)
+  (let ((ls (branch-structure (left-branch m)))
+        (rs (branch-structure (right-branch m)))
+        (ll (branch-length (left-branch m)))
+        (rl (branch-length (right-branch m))))
+    
+    (let ((lres (if (list? ls)
+                    (if (balanced? ls)
+                        (total-weight ls)
+                        #f)
+                    ls))
+                
+          (rres (if (list? rs)
+                    (if (balanced? rs)
+                        (total-weight rs)
+                        #f)
+                    rs)))
+      (if (or (boolean? lres) (boolean? rres))
+          #f
+          (= (* ll lres) (* rl rres))))))
+;2.30
+(define (square-tree t)
+  (cond ((null? t) '())
+        ((list? t) (cons (square-tree (car t))
+                         (square-tree (cdr t))))
+        (else (* t t))))
+
+;2.31
+(define (tree-map f t)
+  (cond ((null? t) '())
+        ((list? t) (cons (tree-map f (car t))
+                         (tree-map f (cdr t))))
+        (else (f t))))
+
+(define (sqt t) (tree-map square t))
+
+;2.32
+(define (subsets s)
+  (if (null? s)
+      (list (list))
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+          
+;2.33
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op initial (cdr sequence)))))
+(define (mapp p sequence)
+  (accumulate (lambda (x y) (cons (p x) y)) '() sequence))
+
+(define (appendp seq1 seq2)
+  (accumulate cons seq2 seq1))
+
+(define (lengthp sequence)
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+
+;2.34
+(define (horner-eval x co-sq)
+  (accumulate (lambda (this-co hi-term) (+ this-co (* x hi-term)))
+              0
+              co-sq))
+
+;2.35
+(define (count-leaves t)
+  (accumulate +
+              0
+              (map
+               (lambda (x)
+                 (if (list? x)
+                     (count-leaves x)
+                     1))
+               t)))
+
+;2.36
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      (list)
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
+
+;2.37
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+(define (matrix-*-vector m v)
+  (map (lambda (x) (dot-product v x)) m))
+(define (transpose mat)
+  (accumulate-n cons (list) mat))
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (x) (matrix-*-vector cols x)) m)))
+
+;2.38
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+
+(define (fold-right op last sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (op (car rest) (iter result (cdr rest)))))
+  (iter last sequence))
+
+;2.39
+
+(define (reverser sequence)
+  (fold-right (lambda (x y) (append y (list x))) '() sequence))
+(define (reversel sequence)
+  (fold-left (lambda (x y) (cons y x)) '() sequence))
+
+;2.40
+(define (enumerate-interval low high)
+  (if (> low high)
+      '()
+      (cons low (enumerate-interval (+ low 1) high))))
+(define (flatmap proc seq)
+  (accumulate append '() (map proc seq)))
+(define (unique-pairs n)
+  (flatmap
+   (lambda (x)
+     (map
+      (lambda (y)(cons y x))
+      (enumerate-interval 1 (- x 1))))
+   (enumerate-interval 1 n)))
+
+
+;2.41
+(define (triple-sum n s)
+  (filter (lambda (x) (= s (+ (car x) (cadr x) (caddr x))))
+          (flatmap (lambda (y) (flatmap (lambda (z)
+                                          (map (cons z y)
+                                               (enumerate-internal 1 (- y 1))
+                                                (enumerate-internal 1 n))))))))
+                     
