@@ -1,3 +1,5 @@
+
+;#lang sicp
 ;2.1
 (define (make-rat n d)
   (let ((g (gcd n d)))
@@ -347,10 +349,95 @@
 
 
 ;2.41
+(define (filter p x)
+  (if (null? x)
+      (list)
+      (if (p (car x))
+          (cons (car x) (filter p (cdr x)))
+          (filter p (cdr x)))))
+
+
+
 (define (triple-sum n s)
-  (filter (lambda (x) (= s (+ (car x) (cadr x) (caddr x))))
-          (flatmap (lambda (y) (flatmap (lambda (z)
-                                          (map (cons z y)
-                                               (enumerate-internal 1 (- y 1))
-                                                (enumerate-internal 1 n))))))))
-                     
+  (filter (lambda (i) (= s (+ (car i) (cadr i) (caddr i))))
+          (flatmap (lambda (x)
+                     (flatmap (lambda (y)
+                                (map (lambda (z)
+                                       (list z y x))
+                                     (enumerate-interval 1 (- y 1))))
+                              (enumerate-interval 1 (- x 1))))
+                   (enumerate-interval 1 (- n 1)))))
+
+;2.42
+(define (queens board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter
+         (lambda (positions) (safe? k positions))
+         (flatmap
+          (lambda (rest-of-queens)
+            (map (lambda (new-row)
+                   (adjoin-position new-row
+                                    k
+                                    rest-of-queens))
+                 (enumerate-interval 1 board-size)))
+          (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+(define (queens2 board-size)
+  (define (queen-cols k)
+    (if (= k 0)
+        (list empty-board)
+        (filter
+         (lambda (positions) (safe? k positions))
+         (flatmap
+          (lambda (new-row)
+            (map (lambda (rest-of-queens)
+                   (adjoin-position new-row k rest-of-queens))
+                 (queen-cols (- k 1))))
+          (enumerate-interval 1 board-size)))))
+  (queen-cols board-size))
+
+
+(define (row x)
+  (car x))
+(define (col x)
+  (cdr x))
+(define empty-board '())
+(define (adjoin-position nr k roq)
+  (append roq (list (cons nr k))))
+(define (safe? k p)
+  (if (= k 0)
+      #t
+      (and
+       (not-in-row (get-elem k p)
+                   (take (- k 1) p))
+       (not-in-row (get-elem k p)
+                   (zipWith (lambda (x y)
+                              (cons (+ x (car y)) (cdr y)))
+                             (reverse (enumerate-interval 1 (- k 1))) (take (- k 1) p)))
+       (not-in-row (get-elem k p)
+                   (zipWith (lambda (x y)
+                              (cons (- (car y) x) (cdr y)))
+                             (reverse (enumerate-interval 1 (- k 1))) (take (- k 1) p))))))
+(define (not-in-row x l)
+  (not (fold-left (lambda (y z) (or y z)) #f (map (lambda (y) (= y (row x))) (map row l)))))
+(define (take k l)
+  (if (or (= k 0) (null? l))
+      (list)
+      (cons (car l) (take (- k 1) (cdr l)))))
+
+(define (get-elem k l)
+  (if (= k 1)
+      (car l)
+      (get-elem (- k 1) (cdr l))))
+(define (zipWith f a b)
+  (if (null? a)
+      b
+      (if (null? b)
+          a
+          (cons (f (car a) (car b)) (zipWith f (cdr a) (cdr b))))))
+  
+;(queens 8)
+
