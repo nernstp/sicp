@@ -695,6 +695,7 @@
                                  left-tree
                                  right-tree)
                       remaining-elts))))))))
+        
                                  
 ;2.65
 (define (union-sett set1 set2)
@@ -723,6 +724,48 @@
                                            (right-branch set1))
                                 (right-branch set2))))))
 
+;(define (intersection-sett set1 set2)
+;  (cond (((or (null? set1) (null? set2))) '())
+;        ((= (entry set1) (entry set2))
+;         (make-tree (entry set1)
+;                    (intersection-sett (left-branch set1)
+;                                       (left-branch set2))
+;                    (intersection-sett (right-branch set1)
+;                                       (right-branch set2))))
+;        ((< (entry set1) (entry set2))
+;         (if (element-of-set?t (entry set2) (right-branch set1)
+
+
 (define (intersection-sett set1 set2)
-  (cond (((or (null? set1) (null? set2))) '())
-        ((
+  (if (or (null? set1) (null? set2))
+      '()
+      (let ((t1 (tree->list-1 set1))
+            (t2 (tree->list-1 set2)))
+        (let ((io (intersection-set t1 t2)))
+          (list->tree io)))))
+
+
+;2.66
+(define (lookup given-key set-of-records)
+  (cond ((null? set-of-records) #f)
+        ((equal? given-key (key (car set-of-records)))
+         (car set-of-records))
+        (else (lookup given-key (cdr set-of-records)))))
+
+(define (lookupo gk sor)
+  (cond ((null? sor) #f)
+        ((equal? gk (key (car sor)))
+         (car sor))
+        ((> gk (key (car sor))) #f)
+        (else (lookup gk (cdr sor)))))
+
+;2.67
+
+
+              
+        
+               
+         
+         
+        
+        
